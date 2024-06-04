@@ -1,8 +1,9 @@
-setwd("E:\\Study\\R\\spatial-causality")
+#setwd("E:\\Study\\R\\spatial-causality")
+setwd("/home/masha/Documents/Studium/MSc_CAM/thesis/GCCM/Gao_code/raster")
 
 # library(GSIF)
-# library(rgdal)
-# library(raster)
+library(rgdal)
+#library(raster)
 # library(gstat)
 # library(ranger)
 # library(scales)
@@ -16,6 +17,9 @@ setwd("E:\\Study\\R\\spatial-causality")
 # library(gdistance)
 # library(DescTools)
 
+#library(sf) # modern alternative for rgdal
+#library(terra) # modern alternative for rgdal
+
 library(parallel)
 library(foreach)
 library(doParallel)
@@ -24,7 +28,7 @@ source("basic.r")
 source("GCCM.r")
 
 
-xImage<-readGDAL("dTRI.tif")     #read the casue variable 
+xImage<-readGDAL("dTRI.tif")     #read the cause variable 
 yImage<-readGDAL("Cu.tif")       #read the effect variable 
  
 plot(xImage)                   #plot the casue variable 
