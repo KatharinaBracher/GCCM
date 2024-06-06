@@ -41,6 +41,7 @@ expandMatrix<- function(dataMatrix,lagNum)
   
   if(lagNum>1)
   {
+    # calls itself recursively, it continues until lagNum becomes 1
     dataMatrix<-expandMatrix(dataMatrix,lagNum-1)
   }
   
@@ -61,7 +62,7 @@ laggedVariable<-function(dataMatrix,lagNum)
 {
   ColNum<-ncol(dataMatrix)
   RowNum<-nrow(dataMatrix)
-  dataMatrix<-expandMatrix(dataMatrix,lagNum)
+  dataMatrix<-expandMatrix(dataMatrix,lagNum) # pad matrix with NA, number of lags
   
   laggedVar<-array(rep(NA,ColNum*RowNum*8*lagNum),dim=c(RowNum,ColNum,8*lagNum))
   
@@ -105,8 +106,9 @@ laggedVariableAs2Dim<-function(dataMatrix,lagNum)
 {
   ColNum<-ncol(dataMatrix)
   RowNum<-nrow(dataMatrix)
-  dataMatrix<-expandMatrix(dataMatrix,lagNum)
+  dataMatrix<-expandMatrix(dataMatrix,lagNum) # pad matrix with NA, number of lags
   
+  # matrix with pixels on row, number of neighbor for specific lag
   laggedVar<-array(rep(NA,ColNum*RowNum*8*lagNum),dim=c(RowNum*ColNum,8*lagNum))
   
   ###By row; from top to down

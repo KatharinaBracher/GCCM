@@ -41,7 +41,7 @@ yMatrix<-as.matrix(yImage)
 #lib_sizes<-seq(10,120,20)   # library sizes, will be the horizontal ordinate  of the result plot. Note here the lib_size is the window size
                             # The largest value ('to' parameter) can be set to the largest size of image (the minor of width and length)
                             # the 'by' can be set by taking account to the computation time
-#test
+# use only 3 Ls (takes 1h)
 lib_sizes<-seq(10,120,50)
 
 E<-3                           # the dimensions of the embedding   
@@ -50,7 +50,7 @@ lib<-NULL
 imageSize<-dim(xMatrix)
 totalRow<-imageSize[1]        #Get the row number of image
 totalCol<-imageSize[2]         #Get the column number of image
-predRows<-seq(5,totalRow,5)    #To save the computation time, not every pixels are predict. The results are almost the same due to the spatial autodim(correctional 
+predRows<-seq(5,totalRow,5)    #To save the computation time, not every pixel is predict. The results are almost the same due to the spatial autodim(correctional 
                                #If computation resources are enough, this filter can be ignored 
 predCols<-seq(5,totalCol,5)
 
