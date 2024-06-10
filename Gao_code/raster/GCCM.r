@@ -59,8 +59,7 @@ GCCM<-function(xMatrix, yMatrix, lib_sizes, lib, pred, E, tau = 1, b = E+1,cores
   xEmbedings<-list()
   xEmbedings[[1]]<- as.array(t(xMatrix)) # focal units s
   
-  for(i in 1:E)
-  {
+  for(i in 1:E) {
     # s(1), s(2), ..., s(E)
     # matrix where row corresponds to each pixel and columns are neighbors of order i 
     xEmbedings[[i+1]]<-laggedVariableAs2Dim(xMatrix, i)  #### row first
@@ -115,7 +114,7 @@ projection<-function(embedings,target,lib_indices, pred_indices,num_neighbors)
   
   pred <- rep.int(NaN, times = length(target))
   
-  for(p in which (pred_indices)) # iterating over all pixel indices that are to be predicted (TRUE)
+  for(p in which(pred_indices)) # iterating over all pixel indices that are to be predicted (TRUE)
   {
     # Temporarily removes the prediction point from the library to ensure the model does not use its own value in prediction
     temp_lib <- lib_indices[p]
