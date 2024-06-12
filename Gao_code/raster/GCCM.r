@@ -15,7 +15,7 @@ GCCMSingle<-function(xEmbedings,yPred,lib_size,pred,totalRow,totalCol,b) {
       pred_indices <- rep.int(FALSE, times = totalRow*totalCol) 
       lib_indices<- rep.int(FALSE, times = totalRow*totalCol)
       
-      pred_indices[locate(pred[,1],pred[,2],totalRow,totalCol) ]<-TRUE # indicating which pixels in the total matrix are for prediction
+      pred_indices[locate(pred[,1],pred[,2],totalRow,totalCol)]<-TRUE # indicating which pixels in the total matrix are for prediction
       
       pred_indices[which(is.na(yPred)) ]<-FALSE # Ensures prediction indices do not include NA values in yPred.
       
@@ -97,7 +97,7 @@ GCCM<-function(xMatrix, yMatrix, lib_sizes, lib, pred, E, tau = 1, b = E+1,cores
   return (x_xmap_y)
 }
 
-
+# equivalent to ravel function in python 
 locate<-function(curRow,curCOl,totalRow,totalCol) # Converts a matrix-style row and column index into a linear index
 {
   return ((curRow-1)*totalCol+curCOl) 
@@ -171,10 +171,14 @@ distance_Com<-function(embeddings,libs,p)
   for(e in 1:length(embeddings))
   {
     emd<-embeddings[[e]]
-    
+    # ?????????
     q <- matrix(rep(emd[p], length(libs)), nrow = length(libs), byrow = T)
   
-    
+    # In R, if you have a matrix (or an array) and you provide only a single index to access an element, 
+    # R will treat the matrix as a vector and use column-major (also known as column-wise) ordering to determine the element. 
+    # Given a matrix emd with dimensions 131 (rows) x 125 (columns), the elements are stored in memory in column-major order. 
+    # This means that elements are filled column by column.
+    # Before the locate function was used which owrks differently than this flat indexing, the wrong p is retrieved. 
     distances<-cbind(distances,abs(emd[libs]-emd[p]))
     
   }
