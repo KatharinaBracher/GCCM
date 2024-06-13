@@ -20,12 +20,13 @@ confidence<- function(r,n,level=0.05)
 }
 
 
-
+######################################
 significance<- function(r,n)
 {
   t<-r*sqrt((n-2)/(1-r*r))
  
-  return (1-pt(t,n-2))*2
+  return (1-pt(t,n-2))*2 # this is not returning the *2
+  # essentially this is returning the one-tailed and not the 2-tailed p value
   
 }
 

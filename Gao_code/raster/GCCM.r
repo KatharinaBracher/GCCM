@@ -59,6 +59,9 @@ GCCM<-function(xMatrix, yMatrix, lib_sizes, lib, pred, E, tau = 1, b = E+1,cores
   xEmbedings<-list()
   xEmbedings[[1]]<- as.array(t(xMatrix)) # focal units s
   
+  ######################################################
+  # this should be E-1 because the first dimension is the focul unit
+  # so this results in a E+1 dimensional embedding
   for(i in 1:E) {
     # s(1), s(2), ..., s(E)
     # matrix where row corresponds to each pixel and columns are neighbors of order i 
@@ -123,6 +126,7 @@ projection<-function(embedings,target,lib_indices, pred_indices,num_neighbors)
     libs <- which(lib_indices)
     
     # compute distances between the embedding of the prediction point and embeddings of all points in the adjusted library.
+    ######################################################
     distances<-distance_Com(embedings,libs,p)
     
     #distances<-colMeans(distances)
@@ -173,7 +177,7 @@ distance_Com<-function(embeddings,libs,p)
     emd<-embeddings[[e]]
     # ????????? this is used nowhere
     q <- matrix(rep(emd[p], length(libs)), nrow = length(libs), byrow = T)
-  
+    ######################################################
     # In R, if you have a matrix (or an array) and you provide only a single index to access an element, 
     # R will treat the matrix as a vector and use column-major (also known as column-wise) ordering to determine the element. 
     # Given a matrix emd with dimensions 131 (rows) x 125 (columns), the elements are stored in memory in column-major order. 
