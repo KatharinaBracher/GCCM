@@ -38,12 +38,9 @@ xMatrix<-as.matrix(xImage)
 yMatrix<-as.matrix(yImage)
 
 
-#lib_sizes<-seq(10,120,20)   # library sizes, will be the horizontal ordinate  of the result plot. Note here the lib_size is the window size
+lib_sizes<-seq(10,120,20)   # library sizes, will be the horizontal ordinate  of the result plot. Note here the lib_size is the window size
                             # The largest value ('to' parameter) can be set to the largest size of image (the minor of width and length)
                             # the 'by' can be set by taking account to the computation time
-# use only 3 Ls (takes 1h)
-#lib_sizes<-seq(10,120,50)
-lib_sizes<-seq(110,110,110)
 
 E<-3                           # the dimensions of the embedding   
 lib<-NULL
@@ -59,7 +56,7 @@ pred<-merge(predRows,predCols)
 
 startTime<-Sys.time()
 
-#x_xmap_y <- GCCM(xMatrix, yMatrix, lib_sizes, lib, pred, E, cores=8)   #predict y with x
+x_xmap_y <- GCCM(xMatrix, yMatrix, lib_sizes, lib, pred, E, cores=8)   #predict y with x
 y_xmap_x <- GCCM(yMatrix, xMatrix, lib_sizes, lib, pred, E, cores=8)    #predict x with y
 
 endTime<-Sys.time()
