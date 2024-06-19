@@ -53,13 +53,13 @@ GCCM<-function(xMatrix, yMatrix, lib_sizes, lib, pred, E, tau = 1, b = E+1,cores
   totalRow<-imageSize[1]
   totalCol<-imageSize[2]
   
-  yPred<- as.array(t(yMatrix))
+  yPred<- as.vector(t(yMatrix)) #####!!!!####### this should be as vector not as.array to flatten (row major bc of T)
   
   xEmbedings<-list()
-  xEmbedings[[1]]<- as.array(t(xMatrix)) # focal units s
+  xEmbedings[[1]]<- as.vector(t(xMatrix)) ######!!!!####### NOW FLAT this should be as vector not as matrix to flatten (row major bc of T)
   
-  ##############################################################################
-  # this should be E-1 because the first dimension is the focul unit
+  ########################################!!!!!!!!!!!!######################################
+  # this should be E-1 because the first dimension is the focal unit
   # the original code results in a E+1 dimensional embedding
   for(i in 1:(E-1)) {
     xEmbedings[[i+1]]<-laggedVariableAs2Dim(xMatrix, i)  #### row first
@@ -112,7 +112,6 @@ projection<-function(embedings,target,lib_indices, pred_indices,num_neighbors)
     libs <- which(lib_indices)
     
     # compute distances between the embedding of the prediction point and embeddings of all points in the adjusted library.
-    ############################################################################
     distances<-distance_Com(embedings,libs,p)
     
     # find nearest neighbors
@@ -139,13 +138,14 @@ projection<-function(embedings,target,lib_indices, pred_indices,num_neighbors)
     
     # make prediction
     # weighted average of the target values at the neighbor locations, using the calculated weights
+    ############# correct now bc of flatten yPred row major
     pred[p] <- (weights %*% target[libs[neighbors]]) / total_weight
     
     
     
     lib_indices[p] <- temp_lib 
   }
-
+  ############# correct now bc of flatten yPred row major
   return(list(pred = pred, stats = compute_stats(target[pred_indices], pred[pred_indices])))
   
 }
@@ -155,8 +155,10 @@ distance_Com<-function(embeddings,libs,p)
 {
   distances<-c()
   
-  ######### flatten first dimension of embedding and calculate distances of first dimension
-  emd <- as.vector(t(embeddings[[1]]))
+  
+  #calculate distances of first dimension
+  
+  emd <- embeddings[[1]] ################## now correct now bc of flatten xMatrix row major
   distances<-cbind(distances,abs(emd[libs]-emd[p]))
 
   for(e in 2:length(embeddings))

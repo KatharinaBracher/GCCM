@@ -140,15 +140,16 @@ def embedding(dataMatrix, E):
     laggedVar, lag_indices = get_lagged_variables(dataMatrix, E) 
     
     # add focal units s
-    embedding = [dataMatrix.T]  # TODO instead flatten the original dataMatrix (that is row-major)
+    ############################################################################# embedding = [dataMatrix.T]
+    embedding = [dataMatrix]  # flatten the original dataMatrix (row-major)
 
     # s(1), s(2), ..., s(E-1)
-    for i in range(1, E): ########## corret embedding size
+    for i in range(1, E): ############################################################################# E+1
         lag = laggedVar[:,np.where(lag_indices==i)] # extract neighbors of different order
         embedding.append(lag.squeeze())
-        # [0] col x row focal
-        # [1] col*row x 8 1st order
-        # [2] col*row x 16 2nd order, ...
+        # [0] row*col
+        # [1] row*col x 8 1st order
+        # [2] row*col x 16 2nd order, ...
     return embedding
 
 
@@ -197,18 +198,17 @@ def projection(embeddings, target, lib_indices, lib_size, pred_indices, E):
         
         # make prediction
         # weighted average of the target values at the neighbor locations, using the calculated weights
-        row, col = basic.convert_column_major_idx(target, libs[neighbors])
+        ################################################# change from R col major flattening to row major indexing
         if adapt:
             rows, cols = target.shape
             target_ = np.full((rows + 2, cols + 2), np.nan)
             target_[:rows, :cols] = target
             original_target = target.copy()
             target = target_
-        pred[p] = np.dot(weights, target[row, col]) / total_weight
+        pred[p] = np.dot(weights, target.flatten()[libs[neighbors]]) / total_weight #######################
         if adapt:
             target = original_target
 
-    row, col = basic.convert_column_major_idx(target, np.where(pred_indices)[0])
     # account for different image size
     if target.shape[0]*target.shape[1]<embeddings[0].shape[0]*embeddings[0].shape[1]:
         rows, cols = target.shape
@@ -216,11 +216,11 @@ def projection(embeddings, target, lib_indices, lib_size, pred_indices, E):
         target_[:rows, :cols] = target
         target = target_
     #print(basic.compute_stats(target[row, col], pred[np.where(pred_indices)[0]]))
-    return pred, basic.compute_stats(target[row, col], pred[np.where(pred_indices)[0]])
+    return pred, basic.compute_stats(target.flatten()[np.where(pred_indices)[0]], pred[np.where(pred_indices)[0]]) ####################
 
 
 def get_distances(xEmbedings, lib_size, E, p, libs):
-    distances = np.full((libs.shape[0], E), np.inf)
+    distances = np.full((libs.shape[0], E), np.inf) 
     emb = xEmbedings[0]
     distances[:,0] = abs(emb.flatten()[libs] - emb.flatten()[p])
     
@@ -230,3 +230,15 @@ def get_distances(xEmbedings, lib_size, E, p, libs):
         distances[:,e] = abs(np.nanmean(dist, axis=1)) # take mean over neighbors
     print(distances.shape)
     return np.nanmean(distances, axis=1)
+#############################################################################
+    '''
+    distances = np.full((libs.shape[0], E+1), np.inf)
+    for e in range(len(xEmbedings)):
+        emb = xEmbedings[e]
+    
+        num_rows = emb.shape[0]
+        # Calculate the row and column in column-major order
+        row, col = basic.convert_column_major_idx(emb, p)
+        row_lib, col_lib = basic.convert_column_major_idx(emb, libs)
+        distances[:,e] = abs(emb[row_lib, col_lib] - emb[row, col])
+    '''
