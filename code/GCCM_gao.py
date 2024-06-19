@@ -13,17 +13,18 @@ def run_GCCM(xMatrix, yMatrix, lib_sizes, E, cores=None):
     # To save the computation time, not every pixel is predict. 
     # The results are almost the same due to the spatial autodim(correctional 
     pred = basic.indices_array(totalRow,totalCol)[4::5 , 4::5, ].reshape(-1,2) # filter every 5th pixel
-    
-    #x_xmap_y_all, x_xmap_y_results = GCCM(xMatrix, yMatrix, pred, lib_sizes, E, cores=cores)
+    print('x_xmap_y')
+    x_xmap_y_all, x_xmap_y_results = GCCM(xMatrix, yMatrix, pred, lib_sizes, E, cores=cores)
+    print('y_xmap_x')
     y_xmap_x_all, y_xmap_x_results = GCCM(yMatrix, xMatrix, pred, lib_sizes, E, cores=cores)
 
-    #results = {'x_xmap_y': x_xmap_y_results, 'y_xmap_x': y_xmap_x_results}    
-    #x_xmap_y_all.to_csv('x_xmap_y.csv', index=False)  
-    #y_xmap_x_all.to_csv('y_xmap_x.csv', index=False)  
+    results = {'x_xmap_y': x_xmap_y_results, 'y_xmap_x': y_xmap_x_results}    
+    x_xmap_y_all.to_csv('x_xmap_y.csv', index=False)  
+    y_xmap_x_all.to_csv('y_xmap_x.csv', index=False)  
     
-    #with open('results.pkl', 'wb') as pickle_file:
-    #    pickle.dump(results, pickle_file)
-    return y_xmap_x_all, y_xmap_x_results #results
+    with open('results.pkl', 'wb') as pickle_file:
+        pickle.dump(results, pickle_file)
+    return results
 
 
 def GCCM(xMatrix, yMatrix, pred, lib_sizes, E, cores=None):
@@ -86,7 +87,6 @@ def GCCMSingle(xEmbedings, yPred, lib_size, pred, totalRow, totalCol, E):
         # Skips to the next iteration if more than half of the values in the library indices are NA
         #if sum(np.isnan(yPred.flatten()[np.where(lib_indices)])) <= (lib_size * lib_size) / 2:
         pred, stats = projection(xEmbedings, yPred, lib_indices, lib_size, pred_indices, E)
-        print(r,c, pred, stats)
         x_xmap_y = pd.concat([x_xmap_y, pd.DataFrame([{'L': lib_size, 'rho': stats['rho']}])], ignore_index=True)
         #else:
             #print('skipped', r, c)
@@ -160,7 +160,12 @@ def embedding(dataMatrix, E):
 
 def projection(embeddings, target, lib_indices, lib_size, pred_indices, E):
     # account for different image size and unexpected behavior in R
-    size = max(embeddings[0].shape[0]*embeddings[0].shape[1], target.shape[0]*target.shape[1])
+    
+    adapt = False
+    size = target.shape[0]*target.shape[1]
+    if target.shape[0]*target.shape[1]<embeddings[0].shape[0]*embeddings[0].shape[1]:
+        adapt = True
+        size = max(embeddings[0].shape[0]*embeddings[0].shape[1], target.shape[0]*target.shape[1])
     pred = np.full(size, np.nan)
     #pred = np.full_like(target, np.nan).flatten()
 
@@ -189,17 +194,19 @@ def projection(embeddings, target, lib_indices, lib_size, pred_indices, E):
             weights = np.where(weights <0.000001, 0.000001, weights)
             
         total_weight = np.sum(weights)
+        
         # make prediction
         # weighted average of the target values at the neighbor locations, using the calculated weights
         row, col = basic.convert_column_major_idx(target, libs[neighbors])
-        if target.shape[0]*target.shape[1]<embeddings[0].shape[0]*embeddings[0].shape[1]:
+        if adapt:
             rows, cols = target.shape
             target_ = np.full((rows + 2, cols + 2), np.nan)
             target_[:rows, :cols] = target
-            original_target = target
+            original_target = target.copy()
             target = target_
         pred[p] = np.dot(weights, target[row, col]) / total_weight
-        target = original_target
+        if adapt:
+            target = original_target
 
     row, col = basic.convert_column_major_idx(target, np.where(pred_indices)[0])
     # account for different image size
@@ -208,7 +215,7 @@ def projection(embeddings, target, lib_indices, lib_size, pred_indices, E):
         target_ = np.full((rows + 1, cols + 1), np.nan)
         target_[:rows, :cols] = target
         target = target_
-    print(basic.compute_stats(target[row, col], pred[np.where(pred_indices)[0]]))
+    #print(basic.compute_stats(target[row, col], pred[np.where(pred_indices)[0]]))
     return pred, basic.compute_stats(target[row, col], pred[np.where(pred_indices)[0]])
 
 

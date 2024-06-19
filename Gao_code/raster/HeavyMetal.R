@@ -87,12 +87,12 @@ colnames(y_xmap_x_interval)<-c("y_xmap_x_upper","y_xmap_x_lower")  #calculate th
 results<-data.frame(lib_sizes,x_xmap_y_means,y_xmap_x_means,x_xmap_y_Sig,y_xmap_x_Sig,x_xmap_y_interval,y_xmap_x_interval)  #Save the cross-mapping prediction results
 
 
-write.csv(results,file="dTRI_nlights03.csv")     
+write.csv(results,file="corrected_results.csv")     
 
 par(mfrow=c(1,1))
 par(mar=c(5, 4, 4, 2) + 0.1)
 
-jpeg(filename = "dTRI_nlights03.jpg",width = 600, height = 400)     #Plot the cross-mapping prediction results
+jpeg(filename = "corrected_results.jpg",width = 600, height = 400)     #Plot the cross-mapping prediction results
 plot(lib_sizes, x_xmap_y_means, type = "l", col = "royalblue", lwd = 2, 
      xlim = c(min(lib_sizes), max(lib_sizes)), ylim = c(0.0, 1), xlab = "L", ylab = expression(rho))
 lines(lib_sizes, y_xmap_x_means, col = "red3", lwd = 2)
