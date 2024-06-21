@@ -29,7 +29,7 @@ def run_GCCM(xMatrix, yMatrix, lib_sizes, E, cores=None):
 
 def GCCM(xMatrix, yMatrix, pred, lib_sizes, E, cores=None):
     totalRow, totalCol = xMatrix.shape
-    yPred = yMatrix.T
+    yPred = yMatrix
     
     # construct embedding
     print('Constructing embedding')

@@ -90,7 +90,7 @@ write.csv(results,file="Nresults_corrected.csv")
 par(mfrow=c(1,1))
 par(mar=c(5, 4, 4, 2) + 0.1)
 
-jpeg(filename = "Nresults.jpg",width = 600, height = 400)     #Plot the cross-mapping prediction results
+jpeg(filename = "Nresults.pdf",width = 600, height = 400)     #Plot the cross-mapping prediction results
 plot(lib_sizes, x_xmap_y_means, type = "l", col = "royalblue", lwd = 2, 
      xlim = c(min(lib_sizes), max(lib_sizes)), ylim = c(0.0, 1), xlab = "L", ylab = expression(rho))
 lines(lib_sizes, y_xmap_x_means, col = "red3", lwd = 2)

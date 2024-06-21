@@ -157,7 +157,6 @@ distance_Com<-function(embeddings,libs,p)
   
   
   #calculate distances of first dimension
-  
   emd <- embeddings[[1]] ################## now correct now bc of flatten xMatrix row major
   distances<-cbind(distances,abs(emd[libs]-emd[p]))
 
@@ -166,12 +165,7 @@ distance_Com<-function(embeddings,libs,p)
     emd<-embeddings[[e]]
     # ????????? this is used nowhere
     q <- matrix(rep(emd[p], length(libs)), nrow = length(libs), byrow = T)
-    ######################################################
-    # In R, if you have a matrix (or an array) and you provide only a single index to access an element, 
-    # R will treat the matrix as a vector and use column-major (also known as column-wise) ordering to determine the element. 
-    # Given a matrix emd with dimensions 131 (rows) x 125 (columns), the elements are stored in memory in column-major order. 
-    # This means that elements are filled column by column.
-    # Before the locate function was used which works differently than this flat indexing, the wrong p is retrieved. 
+    ###################################################### added 
     dist <- sweep(emd[libs,], 2, emd[p,], FUN = "-") # element wise distance
     mean_dist <- rowMeans(dist,na.rm=TRUE) # mean over neighbors
     distances<-cbind(distances,abs(mean_dist))
