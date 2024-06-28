@@ -8,7 +8,7 @@ from multiprocessing import Pool
 import basic_gao as basic
 
 
-def run_GCCM(xMatrix, yMatrix, lib_sizes, E, cores=None):
+def run_GCCM_corrected(xMatrix, yMatrix, lib_sizes, E, outfile, cores=None):
     totalRow, totalCol = xMatrix.shape
     # To save the computation time, not every pixel is predict. 
     # The results are almost the same due to the spatial autodim(correctional 
@@ -19,42 +19,42 @@ def run_GCCM(xMatrix, yMatrix, lib_sizes, E, cores=None):
     y_xmap_x_all, y_xmap_x_results = GCCM(yMatrix, xMatrix, pred, lib_sizes, E, cores=cores)
 
     results = {'x_xmap_y': x_xmap_y_results, 'y_xmap_x': y_xmap_x_results}    
-    x_xmap_y_all.to_csv('x_xmap_y.csv', index=False)  
-    y_xmap_x_all.to_csv('y_xmap_x.csv', index=False)  
+    x_xmap_y_all.to_csv(outfile+'x_xmap_y.csv', index=False)  
+    y_xmap_x_all.to_csv(outfile+'y_xmap_x.csv', index=False)  
     
-    with open('results.pkl', 'wb') as pickle_file:
+    with open(outfile, 'wb') as pickle_file:
         pickle.dump(results, pickle_file)
     return results
 
 
-def GCCM(xMatrix, yMatrix, pred, lib_sizes, E, cores=None):
-    totalRow, totalCol = xMatrix.shape
-    yPred = yMatrix
+def GCCM(sourceMatrix, targetMatrix, pred, lib_sizes, E, cores=None):
+    totalRow, totalCol = sourceMatrix.shape
+    target = targetMatrix.flatten() ################################## 
     
     # construct embedding
     print('Constructing embedding')
-    xEmbedings = embedding(xMatrix, E) 
+    embedding = get_embedding(sourceMatrix, E) 
 
     # initialize 
-    x_xmap_y_all = pd.DataFrame()
-    x_xmap_y_results = {}
+    xmap_all = pd.DataFrame()
+    xmap_results = {}
 
     if cores is None:
         for lib_size in lib_sizes:
-            x_xmap_y = GCCMSingle(xEmbedings, yPred, lib_size, pred, totalRow, totalCol, E)
-            x_xmap_y_all = pd.concat([x_xmap_y_all, x_xmap_y])
-            x_xmap_y_results[lib_size] = basic.results(x_xmap_y, pred)
+            xmap = GCCMSingle(embedding, target, lib_size, pred, totalRow, totalCol, E)
+            xmap_all = pd.concat([xmap_all, xmap])
+            xmap_results[lib_size] = basic.results(xmap, pred)
 
     else:
         with Pool(cores) as p:
-            inputs_x = [[xEmbedings, yPred, lib_size, pred, totalRow, totalCol, E] for lib_size in lib_sizes]
-            x_xmap_y = p.starmap(get_xmap, inputs_x)
+            inputs_x = [[embedding, target, lib_size, pred, totalRow, totalCol, E] for lib_size in lib_sizes]
+            xmap = p.starmap(get_xmap, inputs_x)
             
-            for (out, lib_size) in x_xmap_y:
-                x_xmap_y_all = pd.concat([x_xmap_y_all, out])
-                x_xmap_y_results[lib_size] = basic.results(out, pred)
+            for (out, lib_size) in xmap:
+                xmap_all = pd.concat([xmap_all, out])
+                xmap_results[lib_size] = basic.results(out, pred)
         
-    return x_xmap_y_all, x_xmap_y_results
+    return xmap_all, xmap_results
 
 def get_xmap(embedding, yxPred, lib_size, pred, totalRow, totalCol, E):
     print('libsize ', lib_size)
@@ -63,8 +63,8 @@ def get_xmap(embedding, yxPred, lib_size, pred, totalRow, totalCol, E):
     return xmap, lib_size
 
 
-def GCCMSingle(xEmbedings, yPred, lib_size, pred, totalRow, totalCol, E):
-    x_xmap_y = pd.DataFrame(columns=['L', 'rho'])
+def GCCMSingle(embedding, target, lib_size, pred, totalRow, totalCol, E):
+    xmap = pd.DataFrame(columns=['L', 'rho'])
     pred_flat = [np.ravel_multi_index(pred[i], (totalRow,totalCol)) for i in range(pred.shape[0])]
 
     # sliding library window
@@ -74,8 +74,8 @@ def GCCMSingle(xEmbedings, yPred, lib_size, pred, totalRow, totalCol, E):
         lib_indices = np.zeros(totalRow * totalCol, dtype=bool)
 
         pred_indices[pred_flat] = True # mask which pixels in the total matrix should be predicted
-        if np.isnan(yPred).any():
-            pred_indices[np.isnan(yPred).flatten()] = False # ensure prediction indices do not correspond to NAN values in yPred
+        if np.isnan(target).any():
+            pred_indices[np.isnan(target)] = False # ensure prediction indices do not correspond to NAN values in yPred
 
         # mask for pixels in current library
         lib_rows = np.arange(r, r + lib_size)
@@ -85,13 +85,13 @@ def GCCMSingle(xEmbedings, yPred, lib_size, pred, totalRow, totalCol, E):
         lib_indices[lib_ids_flat] = True
 
         # Skips to the next iteration if more than half of the values in the library indices are NA
-        #if sum(np.isnan(yPred.flatten()[np.where(lib_indices)])) <= (lib_size * lib_size) / 2:
-        pred, stats = projection(xEmbedings, yPred, lib_indices, lib_size, pred_indices, E)
-        x_xmap_y = pd.concat([x_xmap_y, pd.DataFrame([{'L': lib_size, 'rho': stats['rho']}])], ignore_index=True)
-        #else:
-            #print('skipped', r, c)
+        if sum(np.isnan(target[np.where(lib_indices)])) <= (lib_size * lib_size) / 2:
+            pred, stats = projection(embedding, target, lib_indices, lib_size, pred_indices, E)
+            xmap = pd.concat([xmap, pd.DataFrame([{'L': lib_size, 'rho': stats['rho']}])], ignore_index=True)
+        else:
+            print('skipped', r, c)
 
-    return x_xmap_y
+    return xmap
 
 
 ################################
@@ -135,13 +135,13 @@ def get_lagged_variables(dataMatrix, E):
     lag_indices = get_lag_indices(window_dim)
     return laggedVar, lag_indices
 
-def embedding(dataMatrix, E):
+def get_embedding(dataMatrix, E):
     # get neighbors of each unit and position indices of lag orders
     laggedVar, lag_indices = get_lagged_variables(dataMatrix, E) 
     
     # add focal units s
     ############################################################################# embedding = [dataMatrix.T]
-    embedding = [dataMatrix]  # flatten the original dataMatrix (row-major)
+    embedding = [dataMatrix.flatten()]  # flatten the original dataMatrix (row-major)
 
     # s(1), s(2), ..., s(E-1)
     for i in range(1, E): ############################################################################# E+1
@@ -159,15 +159,10 @@ def embedding(dataMatrix, E):
 ################################
 
 
-def projection(embeddings, target, lib_indices, lib_size, pred_indices, E):
+def projection(embedding, target, lib_indices, lib_size, pred_indices, E):
     # account for different image size and unexpected behavior in R
-    
-    adapt = False
-    size = target.shape[0]*target.shape[1]
-    if target.shape[0]*target.shape[1]<embeddings[0].shape[0]*embeddings[0].shape[1]:
-        adapt = True
-        size = max(embeddings[0].shape[0]*embeddings[0].shape[1], target.shape[0]*target.shape[1])
-    pred = np.full(size, np.nan)
+
+    pred = np.full_like(target, np.nan)
     #pred = np.full_like(target, np.nan).flatten()
 
     for p in np.where(pred_indices)[0]:
@@ -177,9 +172,9 @@ def projection(embeddings, target, lib_indices, lib_size, pred_indices, E):
 
         libs = np.where(lib_indices_)[0] # get indices
 
-        # compute distances between the embedding of the prediction point and embeddings of all points in the adjusted library.
+        # compute distances between the embedding of the prediction point and embedding of all points in the adjusted library.
 
-        distances = get_distances(embeddings, lib_size, E, p, libs)
+        distances = get_distances(embedding, lib_size, E, p, libs)
         
         # find nearest neighbors
         neighbors = np.argsort(distances, kind='stable')[:E+1]
@@ -199,42 +194,27 @@ def projection(embeddings, target, lib_indices, lib_size, pred_indices, E):
         # make prediction
         # weighted average of the target values at the neighbor locations, using the calculated weights
         ################################################# change from R col major flattening to row major indexing
-        if adapt:
-            rows, cols = target.shape
-            target_ = np.full((rows + 2, cols + 2), np.nan)
-            target_[:rows, :cols] = target
-            original_target = target.copy()
-            target = target_
-        pred[p] = np.dot(weights, target.flatten()[libs[neighbors]]) / total_weight #######################
-        if adapt:
-            target = original_target
+        pred[p] = np.dot(weights, target[libs[neighbors]]) / total_weight #######################
 
-    # account for different image size
-    if target.shape[0]*target.shape[1]<embeddings[0].shape[0]*embeddings[0].shape[1]:
-        rows, cols = target.shape
-        target_ = np.full((rows + 1, cols + 1), np.nan)
-        target_[:rows, :cols] = target
-        target = target_
     #print(basic.compute_stats(target[row, col], pred[np.where(pred_indices)[0]]))
-    return pred, basic.compute_stats(target.flatten()[np.where(pred_indices)[0]], pred[np.where(pred_indices)[0]]) ####################
+    return pred, basic.compute_stats(target[np.where(pred_indices)[0]], pred[np.where(pred_indices)[0]]) ####################
 
 
-def get_distances(xEmbedings, lib_size, E, p, libs):
+def get_distances(embedding, lib_size, E, p, libs):
     distances = np.full((libs.shape[0], E), np.inf) 
-    emb = xEmbedings[0]
-    distances[:,0] = abs(emb.flatten()[libs] - emb.flatten()[p])
+    emb = embedding[0]
+    distances[:,0] = abs(emb[libs] - emb[p])
     
-    for e in range(1, len(xEmbedings)):
-        emb = xEmbedings[e]
+    for e in range(1, len(embedding)):
+        emb = embedding[e]
         dist = emb[libs,] - emb[p,]
         distances[:,e] = abs(np.nanmean(dist, axis=1)) # take mean over neighbors
-    print(distances.shape)
-    return np.nanmean(distances, axis=1)
+    return np.nanmean(distances, axis=1) # take mean over dimensions
 #############################################################################
     '''
     distances = np.full((libs.shape[0], E+1), np.inf)
-    for e in range(len(xEmbedings)):
-        emb = xEmbedings[e]
+    for e in range(len(embedding)):
+        emb = embedding[e]
     
         num_rows = emb.shape[0]
         # Calculate the row and column in column-major order

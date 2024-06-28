@@ -29,8 +29,12 @@ source("GCCM_corrected.r")
 
 
 #xImage<-readGDAL("dTRI.tif")     #read the cause variable 
-xImage<-readGDAL("nlights03.tif")   
-yImage<-readGDAL("Cu.tif")       #read the effect variable 
+#xImage<-readGDAL("nlights03.tif")   
+#yImage<-readGDAL("Cu.tif")       #read the effect variable 
+
+xImage<-readGDAL("dTRI_aligned.tif")     #read the cause variable 
+xImage<-readGDAL("nlights_aligned.tif")   
+yImage<-readGDAL("Cu_aligned.tif")       #read the effect variable 
  
 plot(xImage)                   #plot the cause variable 
 plot(yImage)                   #plot the cause variable 
@@ -42,7 +46,7 @@ yMatrix<-as.matrix(yImage)
 lib_sizes<-seq(10,120,20)   # library sizes, will be the horizontal ordinate  of the result plot. Note here the lib_size is the window size
                             # The largest value ('to' parameter) can be set to the largest size of image (the minor of width and length)
                             # the 'by' can be set by taking account to the computation time
-
+lib_sizes<-seq(110,120,20) 
 E<-3                           # the dimensions of the embedding   
 lib<-NULL
 

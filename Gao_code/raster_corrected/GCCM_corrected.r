@@ -139,7 +139,7 @@ projection<-function(embedings,target,lib_indices, pred_indices,num_neighbors)
     # make prediction
     # weighted average of the target values at the neighbor locations, using the calculated weights
     ############# correct now bc of flatten yPred row major
-    pred[p] <- (weights %*% target[libs[neighbors]]) / total_weight ########################################
+    pred[p] <- (weights %*% target[libs[neighbors]]) / total_weight #################!!!!!!!!!!!#######################
     
     
     

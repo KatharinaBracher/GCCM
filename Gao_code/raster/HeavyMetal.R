@@ -29,7 +29,9 @@ source("GCCM.r")
 
 
 xImage<-readGDAL("dTRI.tif")     #read the cause variable 
-yImage<-readGDAL("Cu.tif")       #read the effect variable 
+#xImage<-readGDAL("nlights03.tif")     #read the cause variable 
+#yImage<-readGDAL("Cu.tif")       #read the effect variable
+yImage<-readGDAL("Mg.tif")
  
 plot(xImage)                   #plot the cause variable 
 plot(yImage)                   #plot the cause variable 
