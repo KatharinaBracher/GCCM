@@ -28,8 +28,8 @@ source("basic.r")
 source("GCCM.r")
 
 
-xImage<-readGDAL("dTRI.tif")     #read the cause variable 
-#xImage<-readGDAL("nlights03.tif")     #read the cause variable 
+#xImage<-readGDAL("dTRI.tif")     #read the cause variable 
+xImage<-readGDAL("nlights03.tif")     #read the cause variable 
 #yImage<-readGDAL("Cu.tif")       #read the effect variable
 yImage<-readGDAL("Mg.tif")
  
@@ -40,11 +40,9 @@ xMatrix<-as.matrix(xImage)
 yMatrix<-as.matrix(yImage)
 
 
-#lib_sizes<-seq(10,120,20)   # library sizes, will be the horizontal ordinate  of the result plot. Note here the lib_size is the window size
+lib_sizes<-seq(10,120,20)   # library sizes, will be the horizontal ordinate  of the result plot. Note here the lib_size is the window size
                             # The largest value ('to' parameter) can be set to the largest size of image (the minor of width and length)
                             # the 'by' can be set by taking account to the computation time
-# use only 3 Ls (takes 1h)
-lib_sizes<-seq(10,120,50)
 
 E<-3                           # the dimensions of the embedding   
 lib<-NULL
@@ -88,7 +86,7 @@ colnames(y_xmap_x_interval)<-c("y_xmap_x_upper","y_xmap_x_lower")  #calculate th
 results<-data.frame(lib_sizes,x_xmap_y_means,y_xmap_x_means,x_xmap_y_Sig,y_xmap_x_Sig,x_xmap_y_interval,y_xmap_x_interval)  #Save the cross-mapping prediction results
 
 
-write.csv(results,file="dTRI_nlights03.csv")     
+write.csv(results,file="Nresults_Mg.csv")     
 
 par(mfrow=c(1,1))
 par(mar=c(5, 4, 4, 2) + 0.1)

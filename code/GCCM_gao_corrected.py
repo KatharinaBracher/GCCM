@@ -8,7 +8,7 @@ from multiprocessing import Pool
 import basic_gao as basic
 
 
-def run_GCCM_corrected(xMatrix, yMatrix, lib_sizes, E, outfile, cores=None):
+def run_GCCM_corrected(xMatrix, yMatrix, lib_sizes, E, cores=None):
     totalRow, totalCol = xMatrix.shape
     # To save the computation time, not every pixel is predict. 
     # The results are almost the same due to the spatial autodim(correctional 
@@ -19,11 +19,11 @@ def run_GCCM_corrected(xMatrix, yMatrix, lib_sizes, E, outfile, cores=None):
     y_xmap_x_all, y_xmap_x_results = GCCM(yMatrix, xMatrix, pred, lib_sizes, E, cores=cores)
 
     results = {'x_xmap_y': x_xmap_y_results, 'y_xmap_x': y_xmap_x_results}    
-    x_xmap_y_all.to_csv(outfile+'x_xmap_y.csv', index=False)  
-    y_xmap_x_all.to_csv(outfile+'y_xmap_x.csv', index=False)  
+    #x_xmap_y_all.to_csv(outfile+'x_xmap_y.csv', index=False)  
+    #y_xmap_x_all.to_csv(outfile+'y_xmap_x.csv', index=False)  
     
-    with open(outfile, 'wb') as pickle_file:
-        pickle.dump(results, pickle_file)
+    #with open(outfile, 'wb') as pickle_file:
+    #    pickle.dump(results, pickle_file)
     return results
 
 
@@ -56,15 +56,15 @@ def GCCM(sourceMatrix, targetMatrix, pred, lib_sizes, E, cores=None):
         
     return xmap_all, xmap_results
 
-def get_xmap(embedding, yxPred, lib_size, pred, totalRow, totalCol, E):
-    print('libsize ', lib_size)
-    xmap = GCCMSingle(embedding, yxPred, lib_size, pred, totalRow, totalCol, E)
+def get_xmap(embedding, target, lib_size, pred, totalRow, totalCol, E):
+    #sprint('libsize ', lib_size)
+    xmap = GCCMSingle(embedding, target, lib_size, pred, totalRow, totalCol, E)
     
     return xmap, lib_size
 
 
 def GCCMSingle(embedding, target, lib_size, pred, totalRow, totalCol, E):
-    xmap = pd.DataFrame(columns=['L', 'rho'])
+    xmap = pd.DataFrame()
     pred_flat = [np.ravel_multi_index(pred[i], (totalRow,totalCol)) for i in range(pred.shape[0])]
 
     # sliding library window
