@@ -19,11 +19,11 @@ def run_GCCM(xMatrix, yMatrix, lib_sizes, E, cores=None):
     y_xmap_x_all, y_xmap_x_results = GCCM(yMatrix, xMatrix, pred, lib_sizes, E, cores=cores)
 
     results = {'x_xmap_y': x_xmap_y_results, 'y_xmap_x': y_xmap_x_results}    
-    x_xmap_y_all.to_csv('x_xmap_y.csv', index=False)  
-    y_xmap_x_all.to_csv('y_xmap_x.csv', index=False)  
+    #x_xmap_y_all.to_csv('x_xmap_y.csv', index=False)  
+    #y_xmap_x_all.to_csv('y_xmap_x.csv', index=False)  
     
-    with open('results.pkl', 'wb') as pickle_file:
-        pickle.dump(results, pickle_file)
+    #with open('results.pkl', 'wb') as pickle_file:
+    #    pickle.dump(results, pickle_file)
     return results
 
 
@@ -33,7 +33,7 @@ def GCCM(xMatrix, yMatrix, pred, lib_sizes, E, cores=None):
     
     # construct embedding
     print('Constructing embedding')
-    xEmbedings = embedding(xMatrix, E) 
+    xEmbedings = get_embedding(xMatrix, E) 
 
     # initialize 
     x_xmap_y_all = pd.DataFrame()
@@ -135,7 +135,7 @@ def get_lagged_variables(dataMatrix, E):
     lag_indices = get_lag_indices(window_dim)
     return laggedVar, lag_indices
 
-def embedding(dataMatrix, E):
+def get_embedding(dataMatrix, E):
     # get neighbors of each unit and position indices of lag orders
     laggedVar, lag_indices = get_lagged_variables(dataMatrix, E) 
     

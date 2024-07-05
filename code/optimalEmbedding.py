@@ -29,7 +29,7 @@ def run_optEmbedding(xMatrix, yMatrix, lib_size, dims, cores=None):
 
 def GCCM_optEmbedding(sourceMatrix, targetMatrix, pred, lib_size, dims, cores=None):
     totalRow, totalCol = sourceMatrix.shape
-    yPred = targetMatrix.flatten()
+    target = targetMatrix.flatten()
 
     # initialize 
     xmap_all = pd.DataFrame()
@@ -41,13 +41,13 @@ def GCCM_optEmbedding(sourceMatrix, targetMatrix, pred, lib_size, dims, cores=No
     if cores is None:
         for E, embedding in zip(dims, Embeddings):
             #print(E)
-            xmap = GCCM.GCCMSingle(embedding, yPred, lib_size, pred, totalRow, totalCol, E)
+            xmap = GCCM.GCCMSingle(embedding, target, lib_size, pred, totalRow, totalCol, E)
             xmap_all = pd.concat([xmap_all, xmap])
             xmap_results[E] = basic.results(xmap, pred)
 
     else:
         with Pool(cores) as p:
-            inputs_x = [[embedding, yPred, lib_size, pred, totalRow, totalCol, E] for E, embedding in zip(dims, Embeddings)]
+            inputs_x = [[embedding, target, lib_size, pred, totalRow, totalCol, E] for E, embedding in zip(dims, Embeddings)]
             xmap = p.starmap(get_xmap, inputs_x)
             
             for (out, E) in xmap:
