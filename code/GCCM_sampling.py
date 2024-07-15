@@ -70,7 +70,7 @@ def get_xmap(embedding, sourceMatrix, target, lib_size, pred_idx, E):
 
 
 def GCCMSingle(embedding, sourceMatrix, target, lib_size, pred_idx, E):
-    K = 5 # number of subsamples per iteration
+    K = 5 # number of repetitions of supsampling
     xmap = pd.DataFrame()
 
     # sliding library window
