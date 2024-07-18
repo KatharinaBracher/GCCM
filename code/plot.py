@@ -92,7 +92,7 @@ def make_Lplot(fig, position, results, title=None, share=False):
     if not share:
         ax.set_ylabel(r'$\rho$')
 
-        legend = ax.legend(frameon=False, handlelength=0.5)
+        legend = ax.legend(frameon=False, handlelength=0.5) #, loc='upper left'
         for legobj in legend.legendHandles:
             legobj.set_linewidth(2)
     if share:

@@ -29,9 +29,13 @@ source("GCCM.r")
 
 
 #xImage<-readGDAL("dTRI.tif")     #read the cause variable 
-xImage<-readGDAL("nlights03.tif")     #read the cause variable 
+#xImage<-readGDAL("nlights03.tif")     #read the cause variable 
 #yImage<-readGDAL("Cu.tif")       #read the effect variable
-yImage<-readGDAL("Mg.tif")
+#yImage<-readGDAL("Mg.tif")
+
+#xImage<-readGDAL("dTRI_aligned.tif")     #read the cause variable 
+xImage<-readGDAL("nlights_aligned.tif")   
+yImage<-readGDAL("Cu_aligned.tif")       #read the effect variable 
  
 plot(xImage)                   #plot the cause variable 
 plot(yImage)                   #plot the cause variable 
@@ -86,7 +90,7 @@ colnames(y_xmap_x_interval)<-c("y_xmap_x_upper","y_xmap_x_lower")  #calculate th
 results<-data.frame(lib_sizes,x_xmap_y_means,y_xmap_x_means,x_xmap_y_Sig,y_xmap_x_Sig,x_xmap_y_interval,y_xmap_x_interval)  #Save the cross-mapping prediction results
 
 
-write.csv(results,file="Nresults_Mg.csv")     
+write.csv(results,file="Nresults_correctedin.csv")     
 
 par(mfrow=c(1,1))
 par(mar=c(5, 4, 4, 2) + 0.1)
