@@ -60,7 +60,7 @@ def make_Eplot(fig, position, results, title=r' ', share=False):
     ax.set_ylim(-0.1,1)
     ax.set_title(title)
     ax.set_xlabel('E')
-    ax.xaxis.set_major_locator(MaxNLocator(integer=True, nbins=4))
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True, nbins=5))
 
     if not share:
         ax.set_ylabel(r'$\rho$')
