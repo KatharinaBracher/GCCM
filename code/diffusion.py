@@ -32,18 +32,13 @@ def remove_linear_signals(x, y):
 
     # Fit linear model y = M*x + c
     model = LinearRegression()
-
-    model.fit(y_flat, x_flat)
-    x_pred = model.predict(y_flat)
-    x_star_flat = x_flat - x_pred
-    x_star = x_star_flat.reshape(x.shape)
     
     model.fit(x_flat, y_flat)
     y_pred = model.predict(x_flat)
     y_star_flat = y_flat - y_pred
     y_star = y_star_flat.reshape(y.shape) 
 
-    return x_star, y_star
+    return y_star
 
 def laplacian(Z):
     Ztop = Z[0:-2, 1:-1]
@@ -54,20 +49,20 @@ def laplacian(Z):
     return (Ztop + Zleft + Zbottom + Zright - 4 * Zcenter) / dx**2
 
 def show_patterns(U, ax=None):
-    ax.imshow(U, cmap=plt.cm.viridis, vmin=0, vmax=1,
+    ax.imshow(U, cmap=plt.cm.viridis, #vmin=0, vmax=1,
               interpolation='None')
            # extent=[-1, 1, -1, 1])
     ax.set_axis_off()
 
-def run_sim(X_in, Y_in, T, c, a1, a2, saveas=False):
+def run_sim(X_in, Y_in, T, c, a1, a2, plot=True, saveas=False):
     X = X_in.copy()
     Y = Y_in.copy()
     
     dt = .001  # time step, 
     n = int(T / dt)  # number of iterations
-
-    fig, axes = plt.subplots(2,8, figsize=(6.3, 2))
-    step_plot = n // 8
+    if plot:
+        fig, axes = plt.subplots(2,8, figsize=(6.3, 2))
+        step_plot = n // 8
     # We simulate the PDE with the finite difference
     # method.
     for i in range(n):
@@ -93,19 +88,20 @@ def run_sim(X_in, Y_in, T, c, a1, a2, saveas=False):
     
         # We plot the state of the system at
         # 9 different times.
-        if i % step_plot == 0 and i < 8 * step_plot:
-            ax1 = axes[0, i // step_plot]
-            ax2 = axes[1, i // step_plot]
-            
-            show_patterns(X, ax=ax1)
-            ax1.set_title(f'${i * dt:.0f}$')
-            show_patterns(Y, ax=ax2)
-            #ax.set_title(f'Y $t={i * dt:.0f}$')
-            if i // step_plot == 0:
-                ax1.text(-0.25, 0.5, 'X', transform=ax1.transAxes, fontsize=11, horizontalalignment='center')
-                ax2.text(-0.25, 0.5, 'Y', transform=ax2.transAxes, fontsize=11, horizontalalignment='center')
+        if plot:
+            if i % step_plot == 0 and i < 8 * step_plot:
+                ax1 = axes[0, i // step_plot]
+                ax2 = axes[1, i // step_plot]
                 
-    plt.tight_layout()
+                show_patterns(X, ax=ax1)
+                ax1.set_title(f'${i * dt:.0f}$')
+                show_patterns(Y, ax=ax2)
+                #ax.set_title(f'Y $t={i * dt:.0f}$')
+                if i // step_plot == 0:
+                    ax1.text(-0.25, 0.5, 'X', transform=ax1.transAxes, fontsize=11, horizontalalignment='center')
+                    ax2.text(-0.25, 0.5, 'Y', transform=ax2.transAxes, fontsize=11, horizontalalignment='center')
+                
     if saveas:
+        plt.tight_layout()
         plt.savefig(saveas, bbox_inches='tight')
     return X, Y

@@ -8,7 +8,7 @@ from multiprocessing import Pool
 import basic_gao as basic
 
 
-def run_GCCM_sampling(xMatrix, yMatrix, lib_sizes, E, cores=None):
+def run_GCCM_sampling(xMatrix, yMatrix, lib_sizes, E, cores=None, outfile=None):
 
     print('x_xmap_y')
     x_xmap_y_all, x_xmap_y_results = GCCM(xMatrix, yMatrix, lib_sizes, E, cores=cores)

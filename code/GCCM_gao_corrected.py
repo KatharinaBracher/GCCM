@@ -8,7 +8,7 @@ from multiprocessing import Pool
 import basic_gao as basic
 
 
-def run_GCCM_corrected(xMatrix, yMatrix, lib_sizes, E, cores=None):
+def run_GCCM_corrected(xMatrix, yMatrix, lib_sizes, E, cores=None, outfile=None):
     totalRow, totalCol = xMatrix.shape
 
     # FILTER
@@ -22,11 +22,11 @@ def run_GCCM_corrected(xMatrix, yMatrix, lib_sizes, E, cores=None):
     y_xmap_x_all, y_xmap_x_results = GCCM(yMatrix, xMatrix, pred, lib_sizes, E, cores=cores)
 
     results = {'x_xmap_y': x_xmap_y_results, 'y_xmap_x': y_xmap_x_results}    
-    #x_xmap_y_all.to_csv(outfile+'x_xmap_y.csv', index=False)  
-    #y_xmap_x_all.to_csv(outfile+'y_xmap_x.csv', index=False)  
+    x_xmap_y_all.to_csv(outfile+'x_xmap_y.csv', index=False)  
+    y_xmap_x_all.to_csv(outfile+'y_xmap_x.csv', index=False)  
     
-    #with open(outfile, 'wb') as pickle_file:
-    #    pickle.dump(results, pickle_file)
+    with open(outfile+'pkl', 'wb') as pickle_file:
+        pickle.dump(results, pickle_file)
     return results
 
 
