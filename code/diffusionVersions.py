@@ -8,7 +8,7 @@ def run_versions(c, sample, T=30):
     results = {}
     
     a1 = 2.8e-4 # 2.8e-5
-    a2 = 2.8e-4 # 2.8e-3
+    a2 = 2.8e-3
     size = 100  # size of the 2D grid
     dx = 2. / size  # space step
     dims = np.arange(1,9)
@@ -18,7 +18,8 @@ def run_versions(c, sample, T=30):
     sample = sample
     count = 0
     s = 0
-    
+
+    print(a1,a2)
     
     while count <= sample:
         np.random.seed(seed=s)
@@ -26,8 +27,8 @@ def run_versions(c, sample, T=30):
         Y_rand = np.random.rand(size, size)
         X, Y = run_sim(X_rand, Y_rand, T=T, c=c, a1=a1, a2=a2, plot=False)
         correlation_coefficient, p_value = pearsonr(X.flatten(), Y.flatten())
-        s += 1
-        if 0.2 < correlation_coefficient < 0.35:
+        
+        if correlation_coefficient < 0.35: #0.2 < correlation_coefficient < 0.35
             print('running with seed', s)
             emb = run_optEmbedding_sampling(X, Y, lib_size, dims, cores=6)
             conv = run_GCCM_sampling(X, Y, lib_sizes, E=5, cores=6)
@@ -36,5 +37,6 @@ def run_versions(c, sample, T=30):
                                'convergence':conv}
             print('count ', count)
             count += 1
+        s += 1
 
     return results
