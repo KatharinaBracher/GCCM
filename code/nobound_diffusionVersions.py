@@ -4,7 +4,7 @@ from diffusion import remove_linear_signals, run_sim
 from optimalEmbedding_sampling import run_optEmbedding_sampling
 from GCCM_sampling import run_GCCM_sampling
 
-def run_versions(c, sample, T=30):
+def run_versions_(c, sample, T=30):
     results = {}
     
     a1 = 2.8e-4 # 2.8e-5
@@ -28,7 +28,7 @@ def run_versions(c, sample, T=30):
         X, Y = run_sim(X_rand, Y_rand, T=T, c=c, a1=a1, a2=a2, plot=False)
         correlation_coefficient, p_value = pearsonr(X.flatten(), Y.flatten())
         
-        if 0.2 < correlation_coefficient < 0.35:
+        if correlation_coefficient < 0.35:
             print('running with seed', s)
             emb = run_optEmbedding_sampling(X, Y, lib_size, dims, cores=6)
             conv = run_GCCM_sampling(X, Y, lib_sizes, E=5, cores=6)
