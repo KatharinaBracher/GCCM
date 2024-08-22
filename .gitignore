@@ -1,5 +1,10 @@
 #
 SpatialCausalReview
+causalimages-software
+code/find_data
+code/plots
+code/_code.ipynb
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
