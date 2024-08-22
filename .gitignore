@@ -88,6 +88,7 @@ target/
 
 #RStudio
 .Rhistory
+.RData
 
 # IPython
 profile_default/
