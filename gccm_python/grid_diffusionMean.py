@@ -27,19 +27,20 @@ def run_sample(sample, size, c, a1, a2, uuid):
 
     print('running with c=', c, 'and a=', a1, a2)
     
-    for s in range(sample):
+    #for s in range(sample):
+    for s in tqdm(range(sample), desc="running samples"):
         np.random.seed(seed=s)
-        #X_rand = np.random.rand(size, size)
-        #Y_rand = np.random.rand(size, size)
-        #X, Y = run_sim(X_rand, Y_rand, T=T, c=c, a1=a1, a2=a2, plot=False)
-        #correlation_coefficient, p_value = pearsonr(X.flatten(), Y.flatten())
-        #conv = run_GCCM_sampling(X, Y, lib_sizes, E=5, cores=None)
-        conv = None
-        correlation_coefficient, p_value = None, None
+        X_rand = np.random.rand(size, size)
+        Y_rand = np.random.rand(size, size)
+        X, Y = run_sim(X_rand, Y_rand, T=T, c=c, a1=a1, a2=a2, plot=False)
+        correlation_coefficient, p_value = pearsonr(X.flatten(), Y.flatten())
+        conv = run_GCCM_sampling(X, Y, lib_sizes, E=5, cores=None)
+        #conv = None
+        #correlation_coefficient, p_value = None, None
         results[s] = {'corr':[correlation_coefficient, p_value], 
                       'gccm':conv}
 
-    print('finished running with c=', c, 'and a=', a1, a2)
+    print('finished combination')
 
     return results
 

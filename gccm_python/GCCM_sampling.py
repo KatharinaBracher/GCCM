@@ -48,7 +48,7 @@ def GCCM(sourceMatrix, targetMatrix, lib_sizes, E, cores=None):
 
     if cores is None:
         for lib_size in lib_sizes:
-            xmap = GCCMSingle(embedding, sourceMatrix, target, lib_size, totalCol, E)
+            xmap = GCCMSingle(embedding, sourceMatrix, target, lib_size, pred_idx, E)
             xmap_all = pd.concat([xmap_all, xmap])
             xmap_results[lib_size] = basic.results(xmap, pred_idx)
 
