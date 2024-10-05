@@ -7,6 +7,9 @@ import pickle
 import uuid
 from multiprocessing import Pool
 from tqdm import tqdm
+import warnings
+
+warnings.filterwarnings("ignore")
 
 sample = 50
 size = 100  # size of the 2D grid

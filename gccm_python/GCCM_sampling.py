@@ -10,9 +10,9 @@ import basic_gao as basic
 
 def run_GCCM_sampling(xMatrix, yMatrix, lib_sizes, E, cores=None, outfile=None):
 
-    print('x_xmap_y')
+    #print('x_xmap_y')
     x_xmap_y_all, x_xmap_y_results = GCCM(xMatrix, yMatrix, lib_sizes, E, cores=cores)
-    print('y_xmap_x')
+    #print('y_xmap_x')
     y_xmap_x_all, y_xmap_x_results = GCCM(yMatrix, xMatrix, lib_sizes, E, cores=cores)
 
     results = {'x_xmap_y': x_xmap_y_results, 'y_xmap_x': y_xmap_x_results}    
@@ -39,7 +39,7 @@ def GCCM(sourceMatrix, targetMatrix, lib_sizes, E, cores=None):
         pred_idx = pred_idx[~np.isin(pred_idx, nan_idx)]
     
     # construct embedding
-    print('Constructing embedding')
+    #print('Constructing embedding')
     embedding = get_embedding(sourceMatrix, E) 
 
     # initialize 
