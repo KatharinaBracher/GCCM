@@ -28,7 +28,7 @@ def run_sample(sample, size, c, a1, a2, uuid):
     print('running with c=', c, 'and a=', a1, a2)
     
     #for s in range(sample):
-    for s in tqdm(range(sample), desc="running samples"):
+    for s in range(sample):
         np.random.seed(seed=s)
         X_rand = np.random.rand(size, size)
         Y_rand = np.random.rand(size, size)
@@ -53,13 +53,15 @@ def run_grid():
     
     with Pool() as p:
         parameter_list = [(sample, size, c ,a1 ,a2, uuid.uuid4()) for c in c_list for (a1, a2) in a_list]
+        print("len(parameter_list) = ", len(parameter_list))
         #results_list = p.starmap(run_sample, parameter_list)
         results_list = list(tqdm(p.imap(run_sample_wrapper, parameter_list), total=len(parameter_list)))
+
         
         meta = {parameter[5]: parameter for parameter in parameter_list}
         results_map = {parameter[5]: result for parameter, result in zip(parameter_list, results_list)}
     
-        with open('diffusion_results_paper/test.pkl', 'wb') as pickle_file:
+        with open('diffusion_results_paper/test1.pkl', 'wb') as pickle_file:
             pickle.dump({'meta':meta, 'results_map':results_map}, pickle_file)
 
 
