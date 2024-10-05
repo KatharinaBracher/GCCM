@@ -28,7 +28,7 @@ def run_sample(sample, size, c, a1, a2, uuid):
     results = {}
     #filename = 'results_test/c'+str(c)+'_a1'+str(a1)+'_a2'+str(a2)+'.pkl'
 
-    print('running with c=', c, 'and a=', a1, a2)
+    #print('running with c=', c, 'and a=', a1, a2)
     
     #for s in range(sample):
     for s in range(sample):
@@ -43,7 +43,7 @@ def run_sample(sample, size, c, a1, a2, uuid):
         results[s] = {'corr':[correlation_coefficient, p_value], 
                       'gccm':conv}
 
-    print('finished combination')
+    #print('finished combination')
 
     return results
 
