@@ -35,11 +35,11 @@ def run_sample(sample, size, c, a1, a2, uuid):
         np.random.seed(seed=s)
         X_rand = np.random.rand(size, size)
         Y_rand = np.random.rand(size, size)
-        #X, Y = run_sim(X_rand, Y_rand, T=T, c=c, a1=a1, a2=a2, plot=False)
-        #correlation_coefficient, p_value = pearsonr(X.flatten(), Y.flatten())
-        #conv = run_GCCM_sampling(X, Y, lib_sizes, E=5, cores=None)
-        conv = None
-        correlation_coefficient, p_value = None, None
+        X, Y = run_sim(X_rand, Y_rand, T=T, c=c, a1=a1, a2=a2, plot=False)
+        correlation_coefficient, p_value = pearsonr(X.flatten(), Y.flatten())
+        conv = run_GCCM_sampling(X, Y, lib_sizes, E=5, cores=None)
+        #conv = None
+        #correlation_coefficient, p_value = None, None
         results[s] = {'corr':[correlation_coefficient, p_value], 
                       'gccm':conv}
 
@@ -64,7 +64,7 @@ def run_grid():
         meta = {parameter[5]: parameter for parameter in parameter_list}
         results_map = {parameter[5]: result for parameter, result in zip(parameter_list, results_list)}
     
-        with open('diffusion_results_paper/test.pkl', 'wb') as pickle_file:
+        with open('diffusion_results_paper/results.pkl', 'wb') as pickle_file:
             pickle.dump({'meta':meta, 'results_map':results_map}, pickle_file)
 
 
