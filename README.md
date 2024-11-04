@@ -17,4 +17,4 @@ corrected versions in `Gao_code/rater_corrected`
 
 `optimalEmbedding.py` and `optimalEmbedding_sampling.py`: to identify optimal embedding dimension $E$ using original and random sampling. 
 
-
+for example how to run GCCM in Python, see `runGCCM.ipynb`.
