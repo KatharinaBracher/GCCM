@@ -1,9 +1,8 @@
 #
 SpatialCausalReview
 causalimages-software
-code/find_data
-code/plots
-code/_code.ipynb
+gccm_python/code
+gccm_python/plots
 
 
 # Byte-compiled / optimized / DLL files
